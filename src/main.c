@@ -1,6 +1,12 @@
 #include "logger.h"
-#include "ds/dynamic_array.h"
 #include "raylib.h"
+
+#include "grid.h"
+
+#define WINDOW_WIDTH    1200
+#define WINDOW_HEIGHT   800
+#define WINDOW_TITLE    "PathFinder"
+#define WINDOW_FPS      60
 
 int main(void)
 {
@@ -8,9 +14,12 @@ int main(void)
     loggerInit(&config);
     LOG_DEBUG("Logger Initialized!");
 
-    InitWindow(800, 600, "PathFinder");
+    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
     LOG_DEBUG("Raylib window initialized!");
-    SetTargetFPS(60);
+    SetTargetFPS(WINDOW_FPS);
+
+    gridCreate(WINDOW_WIDTH, WINDOW_HEIGHT, 20, 32);
+    LOG_DEBUG("Grid created!");
 
     while(!WindowShouldClose())
     {
@@ -19,10 +28,15 @@ int main(void)
         BeginDrawing();
         ClearBackground(BLACK);
         DrawFPS(0, 0);
+
         // Render
+        gridDraw();
 
         EndDrawing();
     }
+
+    LOG_DEBUG("Grid destruction...");
+    gridDestroy();
 
     LOG_DEBUG("Raylib window closing...");
     CloseWindow();
