@@ -1,0 +1,6 @@
+[submodule "external/Logger"]
+	path = external/Logger
+	url = git@github.com:panagiotisTeas/Logger
+[submodule "external/WIM"]
+	path = external/WIM
+	url = git@github.com:panagiotisTeas/WIM
