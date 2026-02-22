@@ -11,6 +11,7 @@
 int main(void)
 {
     LoggerConfig config = getDefaultLoggerConfig();
+    config.out = LOG_OUTPUT_CONSOLE;
     loggerInit(&config);
     LOG_DEBUG("Logger Initialized!");
 
@@ -24,6 +25,7 @@ int main(void)
     while(!WindowShouldClose())
     {
         // Update
+        gridUpdate();
 
         BeginDrawing();
         ClearBackground(BLACK);
