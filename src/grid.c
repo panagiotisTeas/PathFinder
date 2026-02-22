@@ -1,43 +1,11 @@
 #include "grid.h"
 
 #include "logger.h"
-#include "raylib.h"
 #include "ds/dynamic_array.h"
 
+#include "bfs.h"
+
 #define WINDOW_MARGIN 100
-
-#define CELL_PATH_COLOR     RAYWHITE
-#define CELL_WALL_COLOR     GRAY
-#define CELL_START_COLOR    RED
-#define CELL_GOAL_COLOR     GREEN
-#define CELL_VISITED_COLOR  YELLOW
-#define CELL_SOLUTION_COLOR MAGENTA
-
-typedef struct Cell
-{
-    // 8 bytes
-    u32     distance;
-    u32     weight;
-
-    // 8 bytes
-    u16     x_pos;
-    u16     y_pos;
-    u16     width;
-    u16     height;
-
-    // 4 bytes
-    Color   color;
-
-    // 4 bytes
-    u8 is_start;
-    u8 is_goal;
-    u8 is_visited;
-    u8 is_wall;
-
-    // 2 bytes (+ 2 bytes)
-    u8 row;
-    u8 col;
-} Cell; // 28 bytes
 
 static DynamicArray g_grid  = {0};
 static Cell*        g_start = NULL;
@@ -123,6 +91,9 @@ gridEdit(Color color, u8 is_start, u8 is_goal, u8 is_wall, u8 is_visited)
 
 static void gridClear(void)
 {
+    g_start = NULL;
+    g_goal  = NULL;
+
     for (u64 i = 0; i < daGetSize(&g_grid); ++i)
     {
         Cell* cell = (Cell*)daGet(&g_grid, i);
@@ -139,6 +110,9 @@ static void gridClear(void)
 
 static void gridReset(void)
 {
+    g_start->is_visited = 0;
+    g_goal->is_visited  = 0;
+
     for (u64 i = 0; i < daGetSize(&g_grid); ++i)
     {
         Cell* cell = (Cell*)daGet(&g_grid, i);
@@ -201,6 +175,24 @@ gridUpdate(void)
         LOG_DEBUG("SHIFT + R: Reset Grid");
         gridReset();
     }
+
+    // Breadth First Search
+    if ((IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) && IsKeyPressed(KEY_ONE) && g_start != NULL && g_goal != NULL)
+    {
+        LOG_DEBUG("SHIFT + 1: Breadth First Search");
+        bfsInit(daGetSize(&g_grid));        
+    }
+
+    if (bfsIsInitialized() == 1) bfsStep();
+
+    // Depth First Search
+    // TODO
+
+    // Dijkstra
+    // TODO
+
+    // A*
+    // TODO
 }
 
 void 
@@ -211,4 +203,16 @@ gridDraw(void)
         Cell* cell = (Cell*)daGet(&g_grid, i);
         DrawRectangle(cell->x_pos, cell->y_pos, cell->width - 1, cell->height - 1, cell->color);
     }
+}
+
+void*  
+gridGetStart(void)
+{
+    return &g_start;
+}
+
+void*   
+gridGetGoal(void)
+{
+    return &g_goal;
 }

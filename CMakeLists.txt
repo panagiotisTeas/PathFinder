@@ -73,6 +73,7 @@ endif()
 add_executable(pathfinder 
     src/main.c
     src/grid.c
+    src/bfs.c
 )
 target_include_directories(pathfinder PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/include

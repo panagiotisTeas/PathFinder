@@ -8,6 +8,9 @@
 #define WINDOW_TITLE    "PathFinder"
 #define WINDOW_FPS      60
 
+#define GRID_ROWS 20
+#define GRID_COLS 32
+
 int main(void)
 {
     LoggerConfig config = getDefaultLoggerConfig();
@@ -19,7 +22,7 @@ int main(void)
     LOG_DEBUG("Raylib window initialized!");
     SetTargetFPS(WINDOW_FPS);
 
-    gridCreate(WINDOW_WIDTH, WINDOW_HEIGHT, 20, 32);
+    gridCreate(WINDOW_WIDTH, WINDOW_HEIGHT, GRID_ROWS, GRID_COLS);
     LOG_DEBUG("Grid created!");
 
     while(!WindowShouldClose())
