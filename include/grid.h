@@ -23,18 +23,21 @@ typedef struct Cell
     u16     width;
     u16     height;
 
+    // 8 bytes
+    struct Cell* parent;
+
     // 4 bytes
     Color   color;
 
     // 4 bytes
-    u8 is_start;
-    u8 is_goal;
-    u8 is_visited;
-    u8 is_wall;
+    u8      is_start;
+    u8      is_goal;
+    u8      is_visited;
+    u8      is_wall;
 
     // 2 bytes (+ 2 bytes)
-    u8 row;
-    u8 col;
+    u8      row;
+    u8      col;
 } Cell; // 28 bytes
 
 void gridCreate(u16 window_width, u16 window_height, u8 grid_rows, u8 grid_cols);
@@ -45,5 +48,8 @@ void gridDraw(void);
 
 void*   gridGetStart(void);
 void*   gridGetGoal(void);
+void*   gridGetCell(u8 row, u8 col);
+u8      gridGetRows(void);
+u8      gridGetCols(void);
 
 #endif // PF_GRID_H

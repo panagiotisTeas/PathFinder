@@ -6,6 +6,6 @@
 void bfsInit(u64 capacity);
 void bfsStep(void);
 
-b8  bfsIsInitialized(void);
+b8  bfsShouldStop(void);
 
 #endif // PF_BFS_H

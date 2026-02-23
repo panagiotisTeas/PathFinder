@@ -11,9 +11,15 @@ static DynamicArray g_grid  = {0};
 static Cell*        g_start = NULL;
 static Cell*        g_goal  = NULL;
 
+static u8           g_grid_rows = 0;
+static u8           g_grid_cols = 0;
+
 void 
 gridCreate(u16 window_width, u16 window_height, u8 grid_rows, u8 grid_cols)
 {
+    g_grid_rows = grid_rows;
+    g_grid_cols = grid_cols;
+
     u32 available_window_width  = window_width - 2 * WINDOW_MARGIN;
     u32 available_window_height = window_height - 2 * WINDOW_MARGIN;
 
@@ -34,6 +40,8 @@ gridCreate(u16 window_width, u16 window_height, u8 grid_rows, u8 grid_cols)
                 .y_pos      = WINDOW_MARGIN + cell_height * row,
                 .width      = cell_width,
                 .height     = cell_height,
+
+                .parent     = NULL,
 
                 .color      = CELL_PATH_COLOR,
 
@@ -100,6 +108,7 @@ static void gridClear(void)
 
         cell->distance   = INT32_MAX;
         cell->weight     = 1;
+        cell->parent     = NULL;
         cell->color      = CELL_PATH_COLOR;
         cell->is_goal    = 0;
         cell->is_start   = 0;
@@ -111,7 +120,9 @@ static void gridClear(void)
 static void gridReset(void)
 {
     g_start->is_visited = 0;
+    g_start->color      = CELL_START_COLOR;
     g_goal->is_visited  = 0;
+    g_goal->color       = CELL_GOAL_COLOR;
 
     for (u64 i = 0; i < daGetSize(&g_grid); ++i)
     {
@@ -120,6 +131,7 @@ static void gridReset(void)
         if (cell->is_visited == 1)
         {
             cell->distance   = INT32_MAX;
+            cell->parent     = NULL;
             cell->color      = CELL_PATH_COLOR;
             cell->is_goal    = 0;
             cell->is_start   = 0;
@@ -183,7 +195,7 @@ gridUpdate(void)
         bfsInit(daGetSize(&g_grid));        
     }
 
-    if (bfsIsInitialized() == 1) bfsStep();
+    if (!bfsShouldStop()) bfsStep();
 
     // Depth First Search
     // TODO
@@ -215,4 +227,22 @@ void*
 gridGetGoal(void)
 {
     return &g_goal;
+}
+
+void*   
+gridGetCell(u8 row, u8 col)
+{
+    return (Cell*)daGet(&g_grid, col + g_grid_cols * row);
+}
+
+u8      
+gridGetRows(void)
+{
+    return g_grid_rows;
+}
+
+u8      
+gridGetCols(void)
+{
+    return g_grid_cols;
 }
