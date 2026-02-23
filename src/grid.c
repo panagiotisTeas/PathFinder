@@ -4,6 +4,7 @@
 #include "ds/dynamic_array.h"
 
 #include "bfs.h"
+#include "dfs.h"
 
 #define WINDOW_MARGIN 100
 
@@ -198,7 +199,13 @@ gridUpdate(void)
     if (!bfsShouldStop()) bfsStep();
 
     // Depth First Search
-    // TODO
+    if ((IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) && IsKeyPressed(KEY_TWO) && g_start != NULL && g_goal != NULL)
+    {
+        LOG_DEBUG("SHIFT + 2: Depth First Search");
+        dfsInit(daGetSize(&g_grid));        
+    }
+
+    if (!dfsShouldStop()) dfsStep();
 
     // Dijkstra
     // TODO
