@@ -38,6 +38,8 @@ bfsStep(void)
         g_bfs_is_running    = 0;
         g_bfs_has_finished  = 1;
 
+        qDestroy(&g_bfs_queue);
+
         return;
     }
 
@@ -82,6 +84,7 @@ bfsStep(void)
                     g_bfs_has_finished  = 1;
 
                     buildAnimationPath(neighbor);
+                    qDestroy(&g_bfs_queue);
 
                     return;
                 }

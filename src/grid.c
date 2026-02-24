@@ -5,6 +5,7 @@
 
 #include "bfs.h"
 #include "dfs.h"
+#include "dijkstra.h"
 
 #define WINDOW_MARGIN 100
 
@@ -122,8 +123,10 @@ static void gridReset(void)
 {
     g_start->is_visited = 0;
     g_start->color      = CELL_START_COLOR;
+    g_start->distance   = INT32_MAX;
     g_goal->is_visited  = 0;
     g_goal->color       = CELL_GOAL_COLOR;
+    g_goal->distance    = INT32_MAX;
 
     for (u64 i = 0; i < daGetSize(&g_grid); ++i)
     {
@@ -208,7 +211,13 @@ gridUpdate(void)
     if (!dfsShouldStop()) dfsStep();
 
     // Dijkstra
-    // TODO
+    if ((IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) && IsKeyPressed(KEY_THREE) && g_start != NULL && g_goal != NULL)
+    {
+        LOG_DEBUG("SHIFT + 3: Dijkstra");
+        dijkstraInit(daGetSize(&g_grid));        
+    }
+
+    if (!dijkstraShouldStop()) dijkstraStep();
 
     // A*
     // TODO

@@ -36,6 +36,8 @@ dfsStep(void)
         g_dfs_is_running    = 0;
         g_dfs_has_finished  = 1;
 
+        stackDestroy(&g_dfs_stack);
+
         return;
     }
 
@@ -82,6 +84,7 @@ dfsStep(void)
                     g_dfs_has_finished  = 1;
 
                     buildAnimationPath(neighbor);
+                    stackDestroy(&g_dfs_stack);
 
                     return;
                 }

@@ -76,6 +76,7 @@ add_executable(pathfinder
     src/animate.c
     src/bfs.c
     src/dfs.c
+    src/dijkstra.c
 )
 target_include_directories(pathfinder PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
