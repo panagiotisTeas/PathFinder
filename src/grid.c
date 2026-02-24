@@ -99,6 +99,33 @@ gridEdit(Color color, u8 is_start, u8 is_goal, u8 is_wall, u8 is_visited)
     }
 }
 
+static void 
+gridWeight(i64 weight)
+{
+    for (u64 i = 0; i < daGetSize(&g_grid); ++i)
+    {
+        Cell* cell = (Cell*)daGet(&g_grid, i);
+
+        u16 left    = cell->x_pos;
+        u16 top     = cell->y_pos;
+        u16 right   = cell->x_pos + cell->width;
+        u16 bottom  = cell->y_pos + cell->height;
+
+        u32 mouse_x_pos = GetMouseX();
+        u32 mouse_y_pos = GetMouseY();
+
+        if (left < mouse_x_pos && mouse_x_pos < right &&
+            top  < mouse_y_pos && mouse_y_pos < bottom)
+        {
+            if (cell->weight == 1 && weight < 0) return;
+
+            cell->weight = cell->weight + weight;
+            
+            LOG_DEBUG("Row: %d | Col: %d | Weight: %d", cell->row, cell->col, cell->weight);
+        }
+    }
+}
+
 static void gridClear(void)
 {
     g_start = NULL;
@@ -148,11 +175,28 @@ static void gridReset(void)
 void 
 gridUpdate(void)
 {
+    // Increase weight
+    if (IsKeyDown(KEY_LEFT_SHIFT) && IsKeyPressed(KEY_EQUAL))
+    {
+        LOG_DEBUG("SHIFT + =: Increase Weight");
+        gridWeight(1);
+        return;
+    }
+
+    // Decrease weight
+    if (IsKeyDown(KEY_LEFT_SHIFT) && IsKeyPressed(KEY_MINUS))
+    {
+        LOG_DEBUG("SHIFT + -: Decrease Weight");
+        gridWeight(-1);
+        return;
+    }
+
     // Path
     if ((IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) && IsMouseButtonDown(MOUSE_LEFT_BUTTON))
     {
         LOG_DEBUG("SHIFT + LMB: Path");
         gridEdit(CELL_PATH_COLOR, 0, 0, 0, 0);
+        return;
     }
     
     // Wall
@@ -160,6 +204,7 @@ gridUpdate(void)
     {
         LOG_DEBUG("LMB: Wall");
         gridEdit(CELL_WALL_COLOR, 0, 0, 1, 0);
+        return;
     }
 
     // Start
@@ -168,6 +213,7 @@ gridUpdate(void)
         LOG_DEBUG("RMB: Start");
         if (g_start != NULL) { g_start->color = CELL_PATH_COLOR; g_start->is_start = 0; }
         gridEdit(CELL_START_COLOR, 1, 0, 0, 0);
+        return;
     }
 
     // Goal
@@ -176,6 +222,7 @@ gridUpdate(void)
         LOG_DEBUG("SHIFT + RMB: Goal");
         if (g_goal != NULL) { g_goal->color = CELL_PATH_COLOR; g_start->is_goal = 0; }
         gridEdit(CELL_GOAL_COLOR, 0, 1, 0, 0);
+        return;
     }
 
     // Clear 
@@ -183,6 +230,7 @@ gridUpdate(void)
     {
         LOG_DEBUG("SHIFT + C: Clear Grid");
         gridClear();
+        return;
     }
 
     // Reset
@@ -190,6 +238,7 @@ gridUpdate(void)
     {
         LOG_DEBUG("SHIFT + R: Reset Grid");
         gridReset();
+        return;
     }
 
     // Breadth First Search

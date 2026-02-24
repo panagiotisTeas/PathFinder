@@ -55,6 +55,7 @@ dijkstraStep(void)
     // Choose the node with the minimum distance from the root node in the heap (root node will be selected first)
     Cell* cell;
     heapExtract(&g_dijkstra_heap, &cell);
+    if (cell->is_visited == 1) return;
     cell->is_visited = 1;
 
     if (cell != gridGetStart() && cell != gridGetGoal()) cell->color = CELL_VISITED_COLOR;
@@ -62,6 +63,7 @@ dijkstraStep(void)
     if (cell->is_goal == 1)
     {
         LOG_INFO("Found path!");
+        LOG_INFO("Distance %d", cell->distance);
         g_dijkstra_is_running    = 0;
         g_dijkstra_has_finished  = 1;
 
@@ -94,7 +96,6 @@ dijkstraStep(void)
 
             if (neighbor->is_visited == 1 || neighbor->is_wall == 1) continue;
 
-            neighbor->parent = cell;
             u64 temp = cell->distance + neighbor->weight;
             if (temp < neighbor->distance) 
             {
