@@ -6,6 +6,7 @@
 #include "bfs.h"
 #include "dfs.h"
 #include "dijkstra.h"
+#include "a_star.h"
 
 #define WINDOW_MARGIN 100
 
@@ -15,6 +16,16 @@ static Cell*        g_goal  = NULL;
 
 static u8           g_grid_rows = 0;
 static u8           g_grid_cols = 0;
+
+typedef enum {
+    ALGO_NONE     = 0,
+    ALGO_BFS      = 1,
+    ALGO_DFS      = 2,
+    ALGO_DIJKSTRA = 3,
+    ALGO_ASTAR    = 4
+} ActiveAlgo;
+
+static ActiveAlgo g_active_algo = ALGO_NONE;
 
 void 
 gridCreate(u16 window_width, u16 window_height, u8 grid_rows, u8 grid_cols)
@@ -51,6 +62,8 @@ gridCreate(u16 window_width, u16 window_height, u8 grid_rows, u8 grid_cols)
                 .is_start   = 0,
                 .is_visited = 0,
                 .is_wall    = 0,
+
+                .heuristic  = 0,
 
                 .row        = row,
                 .col        = col
@@ -143,6 +156,7 @@ static void gridClear(void)
         cell->is_start   = 0;
         cell->is_visited = 0;
         cell->is_wall    = 0;
+        cell->heuristic  = 0;
     }
 }
 
@@ -151,9 +165,13 @@ static void gridReset(void)
     g_start->is_visited = 0;
     g_start->color      = CELL_START_COLOR;
     g_start->distance   = INT32_MAX;
+    g_start->heuristic  = 0;
+    g_start->parent     = NULL;
     g_goal->is_visited  = 0;
     g_goal->color       = CELL_GOAL_COLOR;
     g_goal->distance    = INT32_MAX;
+    g_goal->heuristic   = 0;
+    g_goal->parent      = NULL;
 
     for (u64 i = 0; i < daGetSize(&g_grid); ++i)
     {
@@ -164,10 +182,8 @@ static void gridReset(void)
             cell->distance   = INT32_MAX;
             cell->parent     = NULL;
             cell->color      = CELL_PATH_COLOR;
-            cell->is_goal    = 0;
-            cell->is_start   = 0;
             cell->is_visited = 0;
-            cell->is_wall    = 0;
+            cell->heuristic  = 0;
         }
     }
 }
@@ -245,31 +261,45 @@ gridUpdate(void)
     if ((IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) && IsKeyPressed(KEY_ONE) && g_start != NULL && g_goal != NULL)
     {
         LOG_DEBUG("SHIFT + 1: Breadth First Search");
-        bfsInit(daGetSize(&g_grid));        
+        gridReset();
+        g_active_algo = ALGO_BFS;
+        bfsInit(daGetSize(&g_grid));       
     }
 
-    if (!bfsShouldStop()) bfsStep();
+    if (g_active_algo == ALGO_BFS && !bfsShouldStop()) bfsStep();
 
     // Depth First Search
     if ((IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) && IsKeyPressed(KEY_TWO) && g_start != NULL && g_goal != NULL)
     {
         LOG_DEBUG("SHIFT + 2: Depth First Search");
-        dfsInit(daGetSize(&g_grid));        
+        gridReset();
+        g_active_algo = ALGO_DFS;
+        dfsInit(daGetSize(&g_grid));       
     }
 
-    if (!dfsShouldStop()) dfsStep();
+    if (g_active_algo == ALGO_DFS && !dfsShouldStop()) dfsStep();
 
     // Dijkstra
     if ((IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) && IsKeyPressed(KEY_THREE) && g_start != NULL && g_goal != NULL)
     {
         LOG_DEBUG("SHIFT + 3: Dijkstra");
-        dijkstraInit(daGetSize(&g_grid));        
+        gridReset();
+        g_active_algo = ALGO_DIJKSTRA;
+        dijkstraInit(daGetSize(&g_grid));       
     }
 
-    if (!dijkstraShouldStop()) dijkstraStep();
+    if (g_active_algo == ALGO_DIJKSTRA && !dijkstraShouldStop()) dijkstraStep();
 
     // A*
-    // TODO
+    if ((IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) && IsKeyPressed(KEY_FOUR) && g_start != NULL && g_goal != NULL)
+    {
+        LOG_DEBUG("SHIFT + 4: A*");
+        gridReset();
+        g_active_algo = ALGO_ASTAR;
+        aStarInit(daGetSize(&g_grid));       
+    }
+
+    if (g_active_algo == ALGO_ASTAR && !aStarShouldStop()) aStarStep();
 }
 
 void 

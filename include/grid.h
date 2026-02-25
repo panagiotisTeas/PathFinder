@@ -35,10 +35,13 @@ typedef struct Cell
     u8      is_visited;
     u8      is_wall;
 
+    // 4 bytes
+    u32     heuristic;
+
     // 2 bytes (+ 2 bytes)
     u8      row;
     u8      col;
-} Cell; // 28 bytes
+} Cell; // 40 bytes
 
 void gridCreate(u16 window_width, u16 window_height, u8 grid_rows, u8 grid_cols);
 void gridDestroy(void);
