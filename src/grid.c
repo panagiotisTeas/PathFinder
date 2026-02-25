@@ -162,30 +162,19 @@ static void gridClear(void)
 
 static void gridReset(void)
 {
-    g_start->is_visited = 0;
-    g_start->color      = CELL_START_COLOR;
-    g_start->distance   = INT32_MAX;
-    g_start->heuristic  = 0;
-    g_start->parent     = NULL;
-    g_goal->is_visited  = 0;
-    g_goal->color       = CELL_GOAL_COLOR;
-    g_goal->distance    = INT32_MAX;
-    g_goal->heuristic   = 0;
-    g_goal->parent      = NULL;
-
     for (u64 i = 0; i < daGetSize(&g_grid); ++i)
     {
         Cell* cell = (Cell*)daGet(&g_grid, i);
 
-        if (cell->is_visited == 1)
-        {
-            cell->distance   = INT32_MAX;
-            cell->parent     = NULL;
-            cell->color      = CELL_PATH_COLOR;
-            cell->is_visited = 0;
-            cell->heuristic  = 0;
-        }
+        cell->distance   = INT32_MAX;
+        cell->parent     = NULL;
+        cell->color      = cell->is_wall == 1 ? CELL_WALL_COLOR : CELL_PATH_COLOR;
+        cell->is_visited = 0;
+        cell->heuristic  = 0;
     }
+
+    g_start->color  = CELL_START_COLOR;
+    g_goal->color   = CELL_GOAL_COLOR;
 }
 
 void 
@@ -236,7 +225,7 @@ gridUpdate(void)
     if ((IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) && IsMouseButtonPressed(MOUSE_RIGHT_BUTTON))
     {
         LOG_DEBUG("SHIFT + RMB: Goal");
-        if (g_goal != NULL) { g_goal->color = CELL_PATH_COLOR; g_start->is_goal = 0; }
+        if (g_goal != NULL) { g_goal->color = CELL_PATH_COLOR; g_goal->is_goal = 0; }
         gridEdit(CELL_GOAL_COLOR, 0, 1, 0, 0);
         return;
     }

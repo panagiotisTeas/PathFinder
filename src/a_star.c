@@ -115,6 +115,7 @@ aStarStep(void)
         if (new_row >= 0 && new_row < gridGetRows() &&
             new_col >= 0 && new_col < gridGetCols())
         {
+            LOG_DEBUG("New row: %d | New col: %d", new_row, new_col);
             Cell* neighbor = gridGetCell(new_row, new_col);
 
             if (neighbor->is_visited == 1 || neighbor->is_wall == 1) continue;
